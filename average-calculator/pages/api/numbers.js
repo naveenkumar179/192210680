@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-let numberWindow = [];
+let n = [];
 const WINDOW_SIZE = 10;
 
 const thirdPartyEndpoints = {
@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid number type ID' });
   }
 
-  const windowPrevState = [...numberWindow];
+  const windowPrevState = [...n];
 
   try {
     const source = axios.CancelToken.source();
@@ -28,18 +28,18 @@ export default async function handler(req, res) {
     clearTimeout(timeout);
 
     const newNumbers = response.data.numbers || [];
-    const uniqueNew = newNumbers.filter(num => !numberWindow.includes(num));
+    const uniqueNew = newNumbers.filter(num => !n.includes(num));
 
-    numberWindow.push(...uniqueNew);
-    if (numberWindow.length > WINDOW_SIZE) {
-      numberWindow = numberWindow.slice(-WINDOW_SIZE);
+    n.push(...uniqueNew);
+    if (n.length > WINDOW_SIZE) {
+      n = n.slice(-WINDOW_SIZE);
     }
 
-    const avg = (numberWindow.reduce((sum, val) => sum + val, 0) / numberWindow.length).toFixed(2);
+    const avg = (n.reduce((sum, val) => sum + val, 0) / n.length).toFixed(2);
 
     return res.status(200).json({
       windowPrevState,
-      windowCurrState: numberWindow,
+      windowCurrState: n,
       numbers: newNumbers,
       avg: parseFloat(avg),
     });
